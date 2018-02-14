@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Prestamos.com</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+	<header>
+		<div class="container">
+			<div class="top-header">
+				<h1>PRESTAMOS.COM</h1>
+			</div>
+			<nav class="navbar navbar-default">
+				<div class="container-fluid">
+				    <ul class="nav navbar-nav">
+				      <li><a href="#">INICIO</a></li>
+				      <li class="active"><a href="#">CÁLCULO DE PRÉSTAMOS</a></li>
+				    </ul>
+				</div>
+			</nav>
+		</div>
+	</header>
+	<div class="container">
+		<div class="wrapper">
+			<div class="title">
+				<h2>Cálculo de préstamos</h2>
+				<p>Esta calculadora te permite calcular la cuota mensual a pagar en su préstamo, así como el total de intereses</p>
+			</div>
+			<div class="form-wrapper">
+				<form id="calculo-de-prestamos">
+					<fieldset>
+						<legend>Cálculo de préstamos</legend>
+						<div class="form-group row">
+							<div class="col-sm-6 col-xs-12">
+								Importe
+							</div>
+							<div class="col-sm-6 col-xs-12" data-before="$">
+								<input class="form-control calcular" type="text" value="" name="importe" id="importe">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-6 col-xs-12">
+								Provincia
+							</div>
+							<div class="col-sm-6 col-xs-12">
+								<select class="form-control" name="provincia" id="provincia">
+									<option value=""> Seleccione provincia</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-6 col-xs-12">
+								Taza de interés
+							</div>
+							<div class="col-sm-6 col-xs-12" data-after="%">
+								<input class="form-control calcular" type="text" value="" name="taza" id="taza">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-6 col-xs-12">
+								Cuota mensual
+							</div>
+							<div class="col-sm-6 col-xs-12" data-before="$">
+								<input class="form-control" type="text" value="" name="cuota" id="cuota" readonly>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-6 col-xs-12">
+								Total a pagar
+							</div>
+							<div class="col-sm-6 col-xs-12" data-before="$">
+								<input class="form-control" type="text" value="" name="total" id="total" readonly>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-xs-12">
+								<button type="submit" class="btn btn-primary" id="enviar">Enviar</button>
+								<button type="button" class="btn btn-danger" id="borrar">Borrar</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(function(){ 
+
+			$('#borrar').on('click',function(){ 
+				$('.calcular').val('').change();
+			})
+
+			$('.calcular').on('keyup change',function(){ 
+
+				var importe = parseFloat($('#importe').val());
+				var taza = parseFloat($('#taza').val());
+
+				var total = (importe+(importe*(taza/100))).toFixed(2);
+				if (!isNaN(total)) {
+					$('#total').val(total);
+				}else{
+					$('#total').val('');					
+				}
+
+				var cuota = parseFloat(total/12).toFixed(2);
+				if (!isNaN(cuota)) {
+					$('#cuota').val(cuota);
+				}else{
+					$('#cuota').val('');					
+				}
+
+			});
+
+			$.ajax({
+			    url: 'https://raw.githubusercontent.com/dariosus/jsonProvincias/master/provincias.json',
+			    dataType: 'json',
+			    data: {},
+			    success: function(data) {
+					console.log(data);
+					if ($.isArray(data)) {
+						optionsHTML = '';
+						for (var i = 0; i < data.length; i++) {
+							jsonObj = data[i];
+							if (typeof jsonObj == 'object' && jsonObj.state) {
+								optionsHTML +=  '<option value="'+jsonObj.state+'">'+jsonObj.state+'</option>';
+							}
+						}
+						if (optionsHTML) {
+							$('#provincia').append(optionsHTML);
+						}
+					}
+			 	},
+			   error: function(error){
+			       console.log(error.statusText);
+			       alert('Ocurrió un error al cargar el formulario. Intente nuevamente más tarde.');
+			   }
+			
+			});
+			
+
+		});
+	</script>
+</body>
+</html>
